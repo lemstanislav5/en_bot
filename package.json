@@ -1,0 +1,17 @@
+{
+  "name": "needb",
+  "version": "1.0.0",
+  "description": "bot translator and word learning reminder",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.66.0",
+    "nodemon": "^3.1.7",
+    "sqlite3": "^5.1.7"
+  }
+}
