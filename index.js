@@ -1,8 +1,8 @@
 const TelegramBot = require('node-telegram-bot-api');
 const {API_KEY_BOT, ID_USER} = require('../config_bot.js');
-const {sections, hours, minutes, words} = require('./src/sections');
+const {sections, hours, minutes, amountWords} = require('./src/sections');
 const {commands} = require('./src/commands');
-const {findWord, initialization, findUser, addUser, addHours, addMinutes, addWords} = require('./src/api.js');
+const {findWord, initialization, findUser, addUser, addHours, addMinutes, addAmountWords, getUsers, dayLessonUserUpdate, getWords, learnedWordIdUpdate} = require('./src/api.js');
 
 const bot = new TelegramBot(API_KEY_BOT, {
   polling: {
@@ -20,6 +20,7 @@ bot.on('text', async msg => {
     .then(result => {
       if(result.length === 0) {
         addUser(msg.from);
+        console.log('Пользователь добавлен!')
       } else {
         console.log('Пользователь существует!')
       }
@@ -65,7 +66,7 @@ bot.on('callback_query', async msg => {
         setTimeout(() => bot.sendMessage(id, 'Выберите час: ', hours), 500); 
         break;
       case '/select number of words': 
-        setTimeout(() => bot.sendMessage(id, 'Выберите количество слов: ', words), 500);
+        setTimeout(() => bot.sendMessage(id, 'Выберите количество слов: ', amountWords), 500);
         break;
       default:
         if(data.includes('/hours')){
@@ -76,22 +77,46 @@ bot.on('callback_query', async msg => {
         if(data.includes('/minutes')){
           const userMinutes = parseInt(data.replace('/minutes_', ''));
           addMinutes(userMinutes, id);
-          if(user[0].words === 0) setTimeout(() => bot.sendMessage(id, 'Выберите количество слов: ', words), 500);
+          if(user[0].amountWords === 0) {
+            setTimeout(() => bot.sendMessage(id, 'Выберите количество слов: ', amountWords), 500);
+          } else {
+            setTimeout(() => bot.sendMessage(id, '🤝 Поздравляю! \nЕжедневно в ' + user[0].hours + ' час. ' + userMinutes + ' мин.' + ' мы будем изучать по ' + user[0].amountWords + ' слов(a).'), 500);
+          }
         }
-        if(data.includes('/words')){
-          const userWords = parseInt(data.replace('/words_', ''));
-          addWords(userWords, id);
-          setTimeout(() => bot.sendMessage(id, '🤝 Поздравляю! Ежедневно в ' + user[0].hours + ' час. ' + user[0].minutes + ' мин.' + ' мы будем изучать по ' + userWords + ' слов.'), 500);
+        if(data.includes('/amountWords')){
+          const amountWords = parseInt(data.replace('/amountWords_', ''));
+          addAmountWords(amountWords, id);
+          setTimeout(() => bot.sendMessage(id, '🤝 Поздравляю! \nЕжедневно в ' + user[0].hours + ' час. ' + user[0].minutes + ' мин.' + ' мы будем изучать по ' + amountWords + ' слов(a).'), 500);
         }
         
     }
 });
 
-setInterval(()=> {
+setInterval(async () => {
+  const currentDate = new Date();
+  const currentDay = currentDate.getDate();
+  const hours = currentDate.getHours();
+  const minutes = currentDate.getMinutes();
+  const users = await getUsers();
+  users.forEach(async user => {
+    if(user.amountWords > 0 && user.dayLesson !== currentDay){
+      if(user.hours === hours){
+        // Допустима погрешность в 1 минуту
+        if(minutes === user.minutes || user.minutes === minutes + 1){
+          bot.sendMessage(user.user_id, 'СЛОВА');
+          const words = await getWords(user.amountWords, user.learnedWordId);
+          words.forEach(item => {
+            bot.sendMessage(user.user_id, item.word + ' [' + item.transcription + '] ' + item.translation);
+          });
+          // Обновление последнего выученого слова
+          learnedWordIdUpdate(user.learnedWordId + user.amountWords, user.user_id)
+          // Обновление даты последнего урока
+          dayLessonUserUpdate(currentDay, user.user_id);
+        }
+      }
+    }
+  });
   // функция получает данные всех пользователей у которых количество слов больше 0 
   // и сравнивает время, если время обучения больше текущего но меньше текущее + 1 минута, 
   // функция выбирает рандомные слова для обучения
-  let date = new Date();
-  // час в вашем текущем часовом поясе
-  console.log(date.getHours(), date.getMinutes());
-}, 60000);
+}, 1000);

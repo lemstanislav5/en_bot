@@ -67,24 +67,24 @@ module.exports = {
             ]
         })
     },
-    words: {
+    amountWords: {
         reply_markup: JSON.stringify({
             inline_keyboard: [
                 [
-                    {text: '1', callback_data: '/words_1'}, 
-                    {text: '2', callback_data: '/words_2'}, 
-                    {text: '3', callback_data: '/words_3'},
-                    {text: '4', callback_data: '/words_4'},
-                    {text: '5', callback_data: '/words_5'},
-                    {text: '6', callback_data: '/words_6'},
+                    {text: '1', callback_data: '/amountWords_1'}, 
+                    {text: '2', callback_data: '/amountWords_2'}, 
+                    {text: '3', callback_data: '/amountWords_3'},
+                    {text: '4', callback_data: '/amountWords_4'},
+                    {text: '5', callback_data: '/amountWords_5'},
+                    {text: '6', callback_data: '/amountWords_6'},
                 ],
                 [
-                    {text: '7', callback_data: '/words_7'},
-                    {text: '8', callback_data: '/words_8'},
-                    {text: '9', callback_data: '/words_9'},
-                    {text: '10', callback_data: '/words_10'},
-                    {text: '11', callback_data: '/words_11'},
-                    {text: '12', callback_data: '/words_12'},
+                    {text: '7', callback_data: '/amountWords_7'},
+                    {text: '8', callback_data: '/amountWords_8'},
+                    {text: '9', callback_data: '/amountWords_9'},
+                    {text: '10', callback_data: '/amountWords_10'},
+                    {text: '11', callback_data: '/amountWords_11'},
+                    {text: '12', callback_data: '/amountWords_12'},
                 ],
             ]
         })
