@@ -20,7 +20,13 @@ bot.on('text', async msg => {
   try {
     switch(text) {
       case '/start':  
-        setTimeout(() => bot.sendMessage(id, `Данный бот представляет собой словарь (переводчик) английских слов. Его функция обучения заключается в ежедневной автоматической отправке новых слов, которые нужно записывать и повторять.`), 500);
+        // bot.sendPhoto({
+        //   chat_id: id,
+        //   caption: 'This is my test image',
+        //   photo: './src/img/book.png'
+        // });
+        bot.sendPhoto(id, "./src/img/book.png") 
+        setTimeout(() => bot.sendMessage(id, `Данный бот представляет собой словарь (переводчик) английских слов. Его функция обучения заключается в ежедневной автоматической отправке новых слов, которые нужно записывать и повторять.`), 800);
         break;
       case '/options': 
         setTimeout(() => bot.sendMessage(id, 'Выберите: ', sections), 500);
