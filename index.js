@@ -68,10 +68,8 @@ bot.on('callback_query', async msg => {
         break;
       case '/start training':
         const words = await getWords(user[0].learnedWordId, user[0].amountWords);
-        console.log(user[0].amountWords, user[0].learnedWordId, words.length)
         const countWords = words.length - 1;
         words.forEach((item, i) => {
-          console.log(countWords, i)
           const text = item.word + ' [' + item.transcription + '] ' + item.translation;
           if(countWords === i) return setTimeout(() => bot.sendMessage(user[0].user_id, text, сontinue), 1000);
           setTimeout(() => bot.sendMessage(user[0].user_id, text), 300);
