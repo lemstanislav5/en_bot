@@ -4,6 +4,7 @@ module.exports = {
             inline_keyboard: [
                 [{text: '⏱️ время для учебы', callback_data: '/сhoose time to study'}],
                 [{text: '✍️ количество слов', callback_data: '/select number of words'}],
+                [{text: '👨‍🏫 начать обучение', callback_data: '/start training'}],
             ]
         })
     },
@@ -88,5 +89,14 @@ module.exports = {
                 ],
             ]
         })
-    }
+    }, 
+    сontinue: {
+        reply_markup: JSON.stringify({
+            inline_keyboard: [
+                [
+                    {text: '👩‍🏫 Продолжить', callback_data: '/start training'}
+                ]
+            ]
+        })
+    }, 
 }

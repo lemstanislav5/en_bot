@@ -52,6 +52,7 @@ module.exports = {
     return query(db3000, 'run', 'UPDATE users SET dayLesson=? WHERE user_id=?', [date, user_id]);
   },
   getWords: (lastWord, amountWords) => {
+    console.log('lastWord, amountWords: ', lastWord, amountWords)
     return query(db3000, 'all', 'SELECT * FROM dictionary WHERE id BETWEEN ? AND ?', [lastWord, amountWords + lastWord])
     .then(result=>{ 
       return result;
