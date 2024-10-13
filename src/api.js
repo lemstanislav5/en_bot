@@ -53,12 +53,15 @@ module.exports = {
   },
   getWords: (lastWord, amountWords) => {
     return query(db3000, 'all', 'SELECT * FROM dictionary WHERE id BETWEEN ? AND ?', [lastWord, amountWords + lastWord])
-    .then(result=>{ 
-      return result;
-    }); 
+      .then(result=>{ 
+        return result;
+      }); 
   },
   learnedWordIdUpdate: (learnedWordId, user_id) => {
     return query(db3000, 'run', 'UPDATE users SET learnedWordId=? WHERE user_id=?', [learnedWordId, user_id]);
+  },
+  gatАccess: user_id => {
+    return query(db3000, 'run', 'UPDATE users SET access=? WHERE user_id=?', [1, user_id]);
   },
   findWord: word => {
     //Пользовательсктий регистр запроса "Test"

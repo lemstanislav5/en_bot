@@ -1,8 +1,10 @@
 const TelegramBot = require('node-telegram-bot-api');
-const {API_KEY_BOT, ID_USER} = require('../config_bot.js');
+const {API_KEY_BOT, ID_USER, PASSWORD} = require('../config_bot.js');
 const {sections, hours, minutes, amountWords, сontinue} = require('./src/sections');
 const {commands} = require('./src/commands');
-const {findWord, initialization, findUser, addUser, addHours, addMinutes, addAmountWords, getUsers, dayLessonUserUpdate, getWords, learnedWordIdUpdate} = require('./src/api.js');
+const {findWord, initialization, findUser, addUser, addHours, addMinutes, 
+       addAmountWords, getUsers, dayLessonUserUpdate, getWords, learnedWordIdUpdate,
+       gatАccess} = require('./src/api.js');
 
 const bot = new TelegramBot(API_KEY_BOT, {
   polling: {
@@ -11,22 +13,34 @@ const bot = new TelegramBot(API_KEY_BOT, {
   }
 });
 
+const isAccess = (id, user, msg, text) => {
+  if(user.length === 0) {
+    addUser(msg.from);
+    return false;
+  } else {
+    if(PASSWORD === text) {
+      gatАccess(id);
+      setTimeout(() => bot.sendMessage(id, `✋ Привет! \nДанный бот представляет собой словарь 📚 английских слов. \nЕго функция обучения 👨‍🏫 заключается в ежедневной отправке новых слов, которые нужно записывать и повторять.`), 800);
+      setTimeout(() => bot.sendMessage(id, 'Выберите: ', sections), 800);
+      return true;
+    } else if(ID_USER !== msg.from.id && user[0].access !== 1) {
+      bot.sendMessage(id, '✋ Привет! У Вас нет доступа. Извините! 😕');
+      return false;
+    } else {
+      return true;
+    }
+  }
+}
+
 initialization();
 bot.on("polling_error", err => console.log(err));
 bot.on('text', async msg => {
   const id = msg.chat.id;
   const text = msg.text;
-  findUser(msg.from.id)
-    .then(result => {
-      if(result.length === 0) {
-        addUser(msg.from);
-        console.log('Пользователь добавлен!')
-      } else {
-        console.log('Пользователь существует!')
-      }
-    })
-    console.log(msg.from.id)
-  if(ID_USER != msg.from.id) return bot.sendMessage(id, '✋ Привет! У Вас нет доступа. Извините! 😕');
+  const user = await findUser(msg.from.id);
+  const access = isAccess(id, user, msg, text);
+  if(!access) return null;
+
   try {
     switch(text) {
       case '/start':  
@@ -35,13 +49,7 @@ bot.on('text', async msg => {
         setTimeout(() => bot.sendMessage(id, 'Выберите: ', sections), 800);
         break;
       default:
-        if(/\d/.test(text) || /:/i.test(text) || /,/i.test(text)) {
-          if(/\d/.test(text) && /:/i.test(text) && /,/i.test(text)) {
-            return bot.sendMessage(id, 'Правильный формат времени!');
-          } 
-          return bot.sendMessage(id, 'Неправильный формат времени!');
-        } 
-        // Проверка слов
+        if(PASSWORD === text) return null;
         const result = await findWord(text);
         if (result === undefined) return bot.sendMessage(id, 'Напишите слово!');
         const {word, transcription, translation} = result;
@@ -56,10 +64,12 @@ bot.on('text', async msg => {
 bot.setMyCommands(commands);
 
 bot.on('callback_query', async msg => {
-  const data = msg.data;
+  const text = msg.data;
   const id = msg.message.chat.id;
   const user = await findUser(id);
-    switch(data) {
+  const access = isAccess(id, user, msg, text);
+  if(!access) return null;
+    switch(text) {
       case '/сhoose time to study':  
         setTimeout(() => bot.sendMessage(id, '🕛 Выберите час: ', hours), 500); 
         break;
