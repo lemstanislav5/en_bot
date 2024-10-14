@@ -15,6 +15,7 @@ const bot = new TelegramBot(API_KEY_BOT, {
 });
 
 const isAccess = (id, user, msg, text) => {
+  console.log(user)
   if(user.length === 0) {
     addUser(msg.from);
     return false;
@@ -22,7 +23,8 @@ const isAccess = (id, user, msg, text) => {
     if(PASSWORD === text) {
       gatАccess(id);
       setTimeout(() => bot.sendMessage(id, `✋ Привет! \nДанный бот представляет собой словарь 📚 английских слов. \nЕго функция обучения 👨‍🏫 заключается в ежедневной отправке новых слов, которые нужно записывать и повторять.`), 800);
-      setTimeout(() => bot.sendMessage(id, 'Выберите: ', sections), 800);
+      setTimeout(() => bot.sendMessage(id, '✅Выберите: ', sections), 800);
+      setTimeout(() => bot.sendMessage(ID_USER, 'Зарегистрировался новый пользователь'), 800);
       return true;
     } else if(ID_USER !== msg.from.id && user[0].access !== 1) {
       bot.sendMessage(id, '✋ Привет! У Вас нет доступа. Извините! 😕');
@@ -75,16 +77,14 @@ bot.on('callback_query', async msg => {
         setTimeout(() => bot.sendMessage(id, '🕛 Выберите час: ', hours), 500); 
         break;
       case '/select number of words': 
-        setTimeout(() => bot.sendMessage(id, '🔤 Выберите количество слов: ', amountWords), 500);
+        setTimeout(() => bot.sendMessage(id, '📋 Выберите количество слов: ', amountWords), 500);
         break;
       case '/start training':
         const words = await getWords(user[0].learnedWordId, user[0].amountWords);
         const countWords = words.length - 1;
         words.forEach((item, i) => {
           const text = item.word + ' [' + item.transcription + '] ' + item.translation;
-          ////!teamsDoNotRepeat
           if(countWords === i) return setTimeout(() => bot.sendMessage(user[0].user_id, text, сontinue), 1000);
-          //!teamsDoNotRepeat
           setTimeout(() => bot.sendMessage(user[0].user_id, text, teamsRepeat), 300);
         });
         learnedWordIdUpdate(user[0].learnedWordId + user[0].amountWords, user[0].user_id)
@@ -99,7 +99,7 @@ bot.on('callback_query', async msg => {
           const userMinutes = parseInt(data.replace('/minutes_', ''));
           addMinutes(userMinutes, id);
           if(user[0].amountWords === 0) {
-            setTimeout(() => bot.sendMessage(id, '🔤 Выберите количество слов: ', amountWords), 500);
+            setTimeout(() => bot.sendMessage(id, '📋 Выберите количество слов: ', amountWords), 500);
           } else {
             setTimeout(() => bot.sendMessage(id, '🤝 Поздравляю! \nЕжедневно в ' + user[0].hours + ' час. ' + userMinutes + ' мин.' + ' мы будем изучать по ' + user[0].amountWords + ' слов(a).'), 500);
           }
@@ -127,10 +127,8 @@ setInterval(async () => {
           const words = await getWords(user.learnedWordId, user.amountWords);
           words.forEach((item, i) => {
             const text = item.word + ' [' + item.transcription + '] ' + item.translation;
-            ////!teamsDoNotRepeat
-            if(countWords === i) return setTimeout(() => bot.sendMessage(user.user_id, text, сontinue), 1000);
-            //!teamsDoNotRepeat
-            setTimeout(() => bot.sendMessage(user.user_id, text, teamsRepeat), 300);
+            if(countWords === i) return setTimeout(() => bot.sendMessage(user.user_id, text, сontinue), 1200);
+            setTimeout(() => bot.sendMessage(user.user_id, text, teamsRepeat), 200);
           });
           // Обновление последнего выученого слова
           learnedWordIdUpdate(user.learnedWordId + user.amountWords, user.user_id)
