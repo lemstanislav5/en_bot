@@ -82,7 +82,9 @@ bot.on('callback_query', async msg => {
         const countWords = words.length - 1;
         words.forEach((item, i) => {
           const text = item.word + ' [' + item.transcription + '] ' + item.translation;
+          ////!teamsDoNotRepeat
           if(countWords === i) return setTimeout(() => bot.sendMessage(user[0].user_id, text, сontinue), 1000);
+          //!teamsDoNotRepeat
           setTimeout(() => bot.sendMessage(user[0].user_id, text, teamsRepeat), 300);
         });
         learnedWordIdUpdate(user[0].learnedWordId + user[0].amountWords, user[0].user_id)
@@ -123,8 +125,12 @@ setInterval(async () => {
         // Допустима погрешность в 1 минуту
         if(minutes === user.minutes || user.minutes === minutes + 1){
           const words = await getWords(user.learnedWordId, user.amountWords);
-          words.forEach(item => {
-            bot.sendMessage(user.user_id, item.word + ' [' + item.transcription + '] ' + item.translation);
+          words.forEach((item, i) => {
+            const text = item.word + ' [' + item.transcription + '] ' + item.translation;
+            ////!teamsDoNotRepeat
+            if(countWords === i) return setTimeout(() => bot.sendMessage(user.user_id, text, сontinue), 1000);
+            //!teamsDoNotRepeat
+            setTimeout(() => bot.sendMessage(user.user_id, text, teamsRepeat), 300);
           });
           // Обновление последнего выученого слова
           learnedWordIdUpdate(user.learnedWordId + user.amountWords, user.user_id)
