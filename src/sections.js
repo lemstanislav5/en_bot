@@ -2,9 +2,11 @@ module.exports = {
     sections: {
         reply_markup: JSON.stringify({
             inline_keyboard: [
-                [{text: '⏱️ время для учебы', callback_data: '/сhoose time to study'}],
-                [{text: '🔤 количество слов', callback_data: '/select number of words'}],
-                [{text: '👨‍🏫 начать обучение', callback_data: '/start training'}],
+                [{text: '⏱️ Время для учебы', callback_data: '/сhoose time to study'}],
+                [{text: '📋 Количество слов', callback_data: '/select number of words'}],
+                [{text: '👨‍🏫 Начать обучение', callback_data: '/start training'}],
+                [{text: '📈 Статистика изучения', callback_data: '/study statistics'}],
+                [{text: '📕 Словарь трудных слов', callback_data: '/dictionary of difficult words'}],
             ]
         })
     },
@@ -94,9 +96,9 @@ module.exports = {
         reply_markup: JSON.stringify({
             inline_keyboard: [
                 [
-                    {text: '🔁 Повторять', callback_data: '/repeat'}, 
-                    {text: 'ℹ️ В предложении', callback_data: '/in a sentence'}, 
-                    {text: '🔊 Прослушать', callback_data: '/sound'},
+                    {text: '🔁', callback_data: '/repeat'}, 
+                    {text: 'ℹ️', callback_data: '/in a sentence'}, 
+                    {text: '🔊', callback_data: '/sound'},
                 ],
                 [
                     {text: '👩‍🏫 Продолжить', callback_data: '/start training'}
@@ -108,20 +110,9 @@ module.exports = {
         reply_markup: JSON.stringify({
             inline_keyboard: [
                 [
-                    {text: '🔁 Повторять', callback_data: '/repeat'}, 
-                    {text: 'ℹ️ В предложении', callback_data: '/in a sentence'}, 
-                    {text: '🔊 Прослушать', callback_data: '/sound'},
-                ],
-            ]
-        })
-    },
-    teamsDoNotRepeat: {
-        reply_markup: JSON.stringify({
-            inline_keyboard: [
-                [
-                    {text: '🔁 Повторять', callback_data: '/repeat'}, 
-                    {text: 'ℹ️ В предложении', callback_data: '/in a sentence'}, 
-                    {text: '🔊 Прослушать', callback_data: '/sound'},
+                    {text: '🔁', callback_data: '/repeat'}, 
+                    {text: 'ℹ️', callback_data: '/in a sentence'}, 
+                    {text: '🔊', callback_data: '/sound'},
                 ],
             ]
         })
