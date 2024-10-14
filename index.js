@@ -1,6 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const {API_KEY_BOT, ID_USER, PASSWORD} = require('../config_bot.js');
-const {sections, hours, minutes, amountWords, сontinue} = require('./src/sections');
+//!teamsDoNotRepeat
+const {sections, hours, minutes, amountWords, сontinue, teamsRepeat, teamsDoNotRepeat} = require('./src/sections');
 const {commands} = require('./src/commands');
 const {findWord, initialization, findUser, addUser, addHours, addMinutes, 
        addAmountWords, getUsers, dayLessonUserUpdate, getWords, learnedWordIdUpdate,
@@ -53,7 +54,7 @@ bot.on('text', async msg => {
         const result = await findWord(text);
         if (result === undefined) return bot.sendMessage(id, 'Напишите слово!');
         const {word, transcription, translation} = result;
-        await bot.sendMessage(id, word + ' ' + transcription + ' ' + translation);
+        await bot.sendMessage(id, word + ' ' + transcription + ' ' + translation, teamsRepeat);
     }
   }
   catch(error) {
@@ -82,7 +83,7 @@ bot.on('callback_query', async msg => {
         words.forEach((item, i) => {
           const text = item.word + ' [' + item.transcription + '] ' + item.translation;
           if(countWords === i) return setTimeout(() => bot.sendMessage(user[0].user_id, text, сontinue), 1000);
-          setTimeout(() => bot.sendMessage(user[0].user_id, text), 300);
+          setTimeout(() => bot.sendMessage(user[0].user_id, text, teamsRepeat), 300);
         });
         learnedWordIdUpdate(user[0].learnedWordId + user[0].amountWords, user[0].user_id)
         break;

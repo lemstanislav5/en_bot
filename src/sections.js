@@ -3,7 +3,7 @@ module.exports = {
         reply_markup: JSON.stringify({
             inline_keyboard: [
                 [{text: '⏱️ время для учебы', callback_data: '/сhoose time to study'}],
-                [{text: '✍️ количество слов', callback_data: '/select number of words'}],
+                [{text: '🔤 количество слов', callback_data: '/select number of words'}],
                 [{text: '👨‍🏫 начать обучение', callback_data: '/start training'}],
             ]
         })
@@ -94,9 +94,36 @@ module.exports = {
         reply_markup: JSON.stringify({
             inline_keyboard: [
                 [
+                    {text: '🔁 Повторять', callback_data: '/repeat'}, 
+                    {text: 'ℹ️ В предложении', callback_data: '/in a sentence'}, 
+                    {text: '🔊 Прослушать', callback_data: '/sound'},
+                ],
+                [
                     {text: '👩‍🏫 Продолжить', callback_data: '/start training'}
                 ]
             ]
         })
     }, 
+    teamsRepeat: {
+        reply_markup: JSON.stringify({
+            inline_keyboard: [
+                [
+                    {text: '🔁 Повторять', callback_data: '/repeat'}, 
+                    {text: 'ℹ️ В предложении', callback_data: '/in a sentence'}, 
+                    {text: '🔊 Прослушать', callback_data: '/sound'},
+                ],
+            ]
+        })
+    },
+    teamsDoNotRepeat: {
+        reply_markup: JSON.stringify({
+            inline_keyboard: [
+                [
+                    {text: '🔁 Повторять', callback_data: '/repeat'}, 
+                    {text: 'ℹ️ В предложении', callback_data: '/in a sentence'}, 
+                    {text: '🔊 Прослушать', callback_data: '/sound'},
+                ],
+            ]
+        })
+    },
 }
