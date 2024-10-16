@@ -47,9 +47,7 @@ bot.on('text', async msg => {
   try {
     switch(text) {
       case '/start':  
-        // bot.sendPhoto(id, "./src/img/book.png") 
-        setTimeout(() => bot.sendMessage(id, `✋ Привет! \nДанный бот представляет собой словарь 📚 английских слов. \nЕго функция обучения 👨‍🏫 заключается в ежедневной отправке новых слов, которые нужно записывать и повторять.`), 800);
-        setTimeout(() => bot.sendMessage(id, 'Выберите: ', sections), 800);
+        setTimeout(() => bot.sendMessage(id, `✋ Привет! \nДанный бот представляет собой словарь 📚 английских слов. \nЕго функция обучения 👨‍🏫 заключается в ежедневной отправке новых слов, которые нужно записывать и повторять.`, sections), 800);
         break;
       default:
         if(PASSWORD === text) return null;
@@ -87,6 +85,7 @@ bot.on('callback_query', async msg => {
           if(countWords === i) return setTimeout(() => bot.sendMessage(user[0].user_id, text, сontinue), 1000);
           setTimeout(() => bot.sendMessage(user[0].user_id, text, teamsRepeat), 300);
         });
+        console.log(user[0].learnedWordId, user[0].amountWords);
         learnedWordIdUpdate(user[0].learnedWordId + user[0].amountWords, user[0].user_id)
         break;
       default:

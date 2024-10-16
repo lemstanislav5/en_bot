@@ -54,6 +54,7 @@ module.exports = {
   getWords: (lastWord, amountWords) => {
     return query(db3000, 'all', 'SELECT * FROM dictionary WHERE id BETWEEN ? AND ?', [lastWord, amountWords + lastWord])
       .then(result=>{ 
+        console.log(lastWord, amountWords);
         return result;
       }); 
   },
