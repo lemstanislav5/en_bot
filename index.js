@@ -87,7 +87,7 @@ bot.on('callback_query', async msg => {
           setTimeout(() => bot.sendMessage(user[0].user_id, text, {parse_mode: 'HTML'}), 300);
         });
         console.log(user[0].learnedWordId, user[0].amountWords);
-        learnedWordIdUpdate(user[0].learnedWordId + user[0].amountWords, user[0].user_id)
+        learnedWordIdUpdate(user[0].learnedWordId + user[0].amountWords, user[0].user_id);
         break;
       default:
         if(data.includes('/hours')){
