@@ -15,7 +15,6 @@ const bot = new TelegramBot(API_KEY_BOT, {
 });
 
 const isAccess = (id, user, msg, text) => {
-  console.log(user)
   if(user.length === 0) {
     addUser(msg.from);
     return false;
@@ -79,24 +78,28 @@ bot.on('callback_query', async msg => {
         break;
       case '/start training':
         const words = await getWords(user[0].learnedWordId, user[0].amountWords);
-        const countWords = words.length - 1;
-        words.forEach((item, i) => {
-          console.log(item)
-          const text = 'id: '+ item.id +' '+ item.word + ' [' + item.transcription + '] ' + item.translation;
-          if(countWords === i) return setTimeout(() => bot.sendMessage(user[0].user_id, text, сontinue, {parse_mode: 'HTML'}), 1000);
-          setTimeout(() => bot.sendMessage(user[0].user_id, text, {parse_mode: 'HTML'}), 300);
+        let arr = words.map(item => {
+          const text = item.word + ' [' + item.transcription + '] ' + item.translation;
+          return [{text, callback_data: '/' + item.word}]
         });
-        console.log(user[0].learnedWordId, user[0].amountWords);
+        arr = [...arr, [{text: '👩‍🏫 Продолжить', callback_data: '/start training'}]];
+        const newWords = {
+          reply_markup: JSON.stringify({
+              inline_keyboard: arr
+          })
+        }
+        setTimeout(() => bot.sendMessage(user[0].user_id, 'Повторите эти слова: ', newWords), 300);
+
         learnedWordIdUpdate(user[0].learnedWordId + user[0].amountWords, user[0].user_id);
         break;
       default:
-        if(data.includes('/hours')){
-          const userHours = parseInt(data.replace('/hours_', ''));
+        if(text.includes('/hours')){
+          const userHours = parseInt(text.replace('/hours_', ''));
           addHours(userHours, id);
           setTimeout(() => bot.sendMessage(id, '🕒 Выберите минуты: ', minutes), 500);
         } 
-        if(data.includes('/minutes')){
-          const userMinutes = parseInt(data.replace('/minutes_', ''));
+        if(text.includes('/minutes')){
+          const userMinutes = parseInt(text.replace('/minutes_', ''));
           addMinutes(userMinutes, id);
           if(user[0].amountWords === 0) {
             setTimeout(() => bot.sendMessage(id, '📋 Выберите количество слов: ', amountWords), 500);
@@ -104,12 +107,17 @@ bot.on('callback_query', async msg => {
             setTimeout(() => bot.sendMessage(id, '🤝 Поздравляю! \nЕжедневно в ' + user[0].hours + ' час. ' + userMinutes + ' мин.' + ' мы будем изучать по ' + user[0].amountWords + ' слов(a).'), 500);
           }
         }
-        if(data.includes('/amountWords')){
-          const amountWords = parseInt(data.replace('/amountWords_', ''));
+        if(text.includes('/amountWords')){
+          const amountWords = parseInt(text.replace('/amountWords_', ''));
           addAmountWords(amountWords, id);
           setTimeout(() => bot.sendMessage(id, '🤝 Поздравляю! \nЕжедневно в ' + user[0].hours + ' час. ' + user[0].minutes + ' мин.' + ' мы будем изучать по ' + amountWords + ' слов(a).'), 500);
         }
-        
+        //! ЕСЛИ ВЫБРАНО СЛОВО, ТО НЕОБХОДИМО ЕГО ОТОБРАЗИТЬ ЗАНОВО С ПЕРЕВОДОМ И ВЫБОРОМ ОПЦИЙ
+        const selectedWord = text.replace('/', '');
+        const result = await findWord(selectedWord);
+        const {word, transcription, translation} = result;
+        //! Поставить условияе teamsRepeat либо повторять, либо снять с повторения
+        await bot.sendMessage(id, word + ' ' + transcription + ' ' + translation, teamsRepeat);
     }
 });
 
@@ -127,7 +135,6 @@ setInterval(async () => {
         if(minutes === user.minutes || user.minutes === minutes + 1){
           const words = await getWords(user.learnedWordId, user.amountWords);
           words.forEach((item, i) => {
-            console.log(item)
             const text = item.word + ' [' + item.transcription + '] ' + item.translation;
             if(countWords === i) return setTimeout(() => bot.sendMessage(user.user_id, text, сontinue), 1200);
             setTimeout(() => bot.sendMessage(user.user_id, text), 200);

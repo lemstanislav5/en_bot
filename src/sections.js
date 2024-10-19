@@ -105,7 +105,7 @@ module.exports = {
         reply_markup: JSON.stringify({
             inline_keyboard: [
                 [
-                    {text: '🔁', callback_data: '/repeat'}, 
+                    {text: '🔁🔂✅❎', callback_data: '/repeat'}, 
                     {text: 'ℹ️', callback_data: '/in a sentence'}, 
                     {text: '🔊', callback_data: '/sound'},
                 ],
