@@ -81,9 +81,10 @@ bot.on('callback_query', async msg => {
         const words = await getWords(user[0].learnedWordId, user[0].amountWords);
         const countWords = words.length - 1;
         words.forEach((item, i) => {
-          const text = item.word + ' [' + item.transcription + '] ' + item.translation;
-          if(countWords === i) return setTimeout(() => bot.sendMessage(user[0].user_id, text, сontinue), 1000);
-          setTimeout(() => bot.sendMessage(user[0].user_id, text, teamsRepeat), 300);
+          console.log(item)
+          const text = 'id: '+ item.id +' '+ item.word + ' [' + item.transcription + '] ' + item.translation;
+          if(countWords === i) return setTimeout(() => bot.sendMessage(user[0].user_id, text, сontinue, {parse_mode: 'HTML'}), 1000);
+          setTimeout(() => bot.sendMessage(user[0].user_id, text, {parse_mode: 'HTML'}), 300);
         });
         console.log(user[0].learnedWordId, user[0].amountWords);
         learnedWordIdUpdate(user[0].learnedWordId + user[0].amountWords, user[0].user_id)
@@ -112,6 +113,7 @@ bot.on('callback_query', async msg => {
     }
 });
 
+// Функция повторяется каждую минут и при наступлении времени обучения высылает слова
 setInterval(async () => {
   const currentDate = new Date();
   const currentDay = currentDate.getDate();
@@ -125,9 +127,10 @@ setInterval(async () => {
         if(minutes === user.minutes || user.minutes === minutes + 1){
           const words = await getWords(user.learnedWordId, user.amountWords);
           words.forEach((item, i) => {
+            console.log(item)
             const text = item.word + ' [' + item.transcription + '] ' + item.translation;
             if(countWords === i) return setTimeout(() => bot.sendMessage(user.user_id, text, сontinue), 1200);
-            setTimeout(() => bot.sendMessage(user.user_id, text, teamsRepeat), 200);
+            setTimeout(() => bot.sendMessage(user.user_id, text), 200);
           });
           // Обновление последнего выученого слова
           learnedWordIdUpdate(user.learnedWordId + user.amountWords, user.user_id)
