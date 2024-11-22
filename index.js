@@ -3,9 +3,10 @@ const {API_KEY_BOT, ID_USER, PASSWORD} = require('../config_bot.js');
 //!teamsDoNotRepeat
 const {sections, hours, minutes, amountWords, сontinue, teamsRepeat, teamsDoNotRepeat} = require('./src/sections');
 const {commands} = require('./src/commands');
-const {findWord, initialization, findUser, addUser, addHours, addMinutes, 
+const {findWord, initialization, findUser, addUser, addHours, addMinutes,
        addAmountWords, getUsers, dayLessonUserUpdate, getWords, learnedWordIdUpdate,
-       gatАccess} = require('./src/api.js');
+       gatАccess, addRequests} = require('./src/api.js');
+const {clock} = require('./src/utility/drawGraph.js')
 
 const bot = new TelegramBot(API_KEY_BOT, {
   polling: {
@@ -45,7 +46,7 @@ bot.on('text', async msg => {
 
   try {
     switch(text) {
-      case '/start':  
+      case '/start':
         setTimeout(() => bot.sendMessage(id, `✋ Привет! \nДанный бот представляет собой словарь 📚 английских слов. \nЕго функция обучения 👨‍🏫 заключается в ежедневной отправке новых слов, которые нужно записывать и повторять.`, sections), 800);
         break;
       default:
@@ -70,10 +71,10 @@ bot.on('callback_query', async msg => {
   const access = isAccess(id, user, msg, text);
   if(!access) return null;
     switch(text) {
-      case '/сhoose time to study':  
-        setTimeout(() => bot.sendMessage(id, '🕛 Выберите час: ', hours), 500); 
+      case '/сhoose time to study':
+        setTimeout(() => bot.sendMessage(id, '🕛 Выберите час: ', hours), 500);
         break;
-      case '/select number of words': 
+      case '/select number of words':
         setTimeout(() => bot.sendMessage(id, '📋 Выберите количество слов: ', amountWords), 500);
         break;
       case '/start training':
@@ -91,14 +92,17 @@ bot.on('callback_query', async msg => {
         setTimeout(() => bot.sendMessage(user[0].user_id, 'Повторите эти слова: ', newWords), 300);
 
         learnedWordIdUpdate(user[0].learnedWordId + user[0].amountWords, user[0].user_id);
+        // Вносим статистические данные
+        const date = new Date();
+        let time = date.getTime();
+        await addRequests(user[0].user_id, user[0].amountWords, time);
         break;
       default:
         if(text.includes('/hours')){
           const userHours = parseInt(text.replace('/hours_', ''));
           addHours(userHours, id);
           setTimeout(() => bot.sendMessage(id, '🕒 Выберите минуты: ', minutes), 500);
-        } 
-        if(text.includes('/minutes')){
+        } else if(text.includes('/minutes')){
           const userMinutes = parseInt(text.replace('/minutes_', ''));
           addMinutes(userMinutes, id);
           if(user[0].amountWords === 0) {
@@ -106,18 +110,31 @@ bot.on('callback_query', async msg => {
           } else {
             setTimeout(() => bot.sendMessage(id, '🤝 Поздравляю! \nЕжедневно в ' + user[0].hours + ' час. ' + userMinutes + ' мин.' + ' мы будем изучать по ' + user[0].amountWords + ' слов(a).'), 500);
           }
-        }
-        if(text.includes('/amountWords')){
+        } else if(text.includes('/amountWords')){
           const amountWords = parseInt(text.replace('/amountWords_', ''));
           addAmountWords(amountWords, id);
           setTimeout(() => bot.sendMessage(id, '🤝 Поздравляю! \nЕжедневно в ' + user[0].hours + ' час. ' + user[0].minutes + ' мин.' + ' мы будем изучать по ' + amountWords + ' слов(a).'), 500);
+        } else if(text.includes('/study statistics')){
+          clock();
+          //! НЕОБХОДИМО
+          /**
+            Необходимо:
+            1. Добавить в таблицу строку ДАТА запроса на обучение, КОЛИЧЕСТВО запросов в течении 24 часов
+            2. Подключить библиотеку создания изображения
+            3. Написать скрипт генерации картинки
+          */
         }
         //! ЕСЛИ ВЫБРАНО СЛОВО, ТО НЕОБХОДИМО ЕГО ОТОБРАЗИТЬ ЗАНОВО С ПЕРЕВОДОМ И ВЫБОРОМ ОПЦИЙ
-        const selectedWord = text.replace('/', '');
-        const result = await findWord(selectedWord);
-        const {word, transcription, translation} = result;
-        //! Поставить условияе teamsRepeat либо повторять, либо снять с повторения
-        await bot.sendMessage(id, word + ' ' + transcription + ' ' + translation, teamsRepeat);
+        if(text.indexOf('/') == -1){
+          const selectedWord = text.replace('/', '');
+          const result = await findWord(selectedWord);
+          console.log(text);
+          const {word, transcription, translation} = result;
+          //! Поставить условияе teamsRepeat либо повторять, либо снять с повторения
+          await bot.sendMessage(id, word + ' ' + transcription + ' ' + translation, teamsRepeat);
+        } else {
+          console.log(text);
+        }
     }
 });
 
@@ -147,7 +164,7 @@ setInterval(async () => {
       }
     }
   });
-  // функция получает данные всех пользователей у которых количество слов больше 0 
-  // и сравнивает время, если время обучения больше текущего но меньше текущее + 1 минута, 
+  // функция получает данные всех пользователей у которых количество слов больше 0
+  // и сравнивает время, если время обучения больше текущего но меньше текущее + 1 минута,
   // функция выбирает рандомные слова для обучения
 }, 1000);
