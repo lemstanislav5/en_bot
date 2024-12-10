@@ -58,6 +58,14 @@ module.exports = {
         return result;
       });
   },
+  getStatistics: user_id => {
+    console.log(user_id);
+    return query(db3000, 'all', 'SELECT * FROM statistics WHERE user_id=?', [user_id])
+    .then(result=>{
+      console.log(result);
+      return result;
+    });
+  },
   learnedWordIdUpdate: (learnedWordId, user_id) => {
     return query(db3000, 'run', 'UPDATE users SET learnedWordId=? WHERE user_id=?', [learnedWordId, user_id]);
   },

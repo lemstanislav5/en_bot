@@ -5,7 +5,7 @@ const {sections, hours, minutes, amountWords, сontinue, teamsRepeat, teamsDoNot
 const {commands} = require('./src/commands');
 const {findWord, initialization, findUser, addUser, addHours, addMinutes,
        addAmountWords, getUsers, dayLessonUserUpdate, getWords, learnedWordIdUpdate,
-       gatАccess, addRequests} = require('./src/api.js');
+       gatАccess, addRequests, getStatistics} = require('./src/api.js');
 const {clock} = require('./src/utility/drawGraph.js')
 
 const bot = new TelegramBot(API_KEY_BOT, {
@@ -94,8 +94,45 @@ bot.on('callback_query', async msg => {
         learnedWordIdUpdate(user[0].learnedWordId + user[0].amountWords, user[0].user_id);
         // Вносим статистические данные
         const date = new Date();
-        let time = date.getTime();
+        const time = date.getTime();
         await addRequests(user[0].user_id, user[0].amountWords, time);
+        break;
+      case '/study statistics':
+        // setTimeout(() => bot.sendMessage(id, '📋 Выберите количество слов: ', amountWords), 500);
+        /**
+         * Функция getStatistics получает данные обо всей статистике конкретного пользователя
+         * необходимо дополнить ее двумя параметрами:
+         * 1 - числовое выражение даты - понедельника текущей недели
+         * 2 - числовое выражение воскресенья - понедельника текущей недели
+         * 
+         */
+        function getStartDate(){
+          let result = 0;
+          const date = new Date();
+          const time = date.getTime();
+          const dayOfTheWeek = date.getDay();
+          const hours = date.getHours();
+          const minutes = date.getMinutes(); 
+          const seconds = date.getSeconds(); 
+          const milliseconds = date.getMilliseconds();
+          if(dayOfTheWeek > 1){
+            result = time - 86400000 * dayOfTheWeek - hours * 3600000 - minutes * 60000 - seconds*1000 - milliseconds;
+          } else {
+            result = hours * 3600000 - minutes * 60000 - seconds*1000 - milliseconds;
+          }
+          console.log("Текущий понедельник начался: ", result);
+        }
+        await getStatistics(user[0].user_id);
+        //! Сервер реализован в функции clock
+        clock();
+        //! НЕОБХОДИМО
+        /**
+         * НАСТРОЙКА https://rutube.ru/video/4b8047da05c099958e633b92187f32b8/
+          Необходимо:
+          1. Добавить в таблицу строку ДАТА запроса на обучение, КОЛИЧЕСТВО запросов в течении 24 часов
+          2. Подключить библиотеку создания изображения
+          3. Написать скрипт генерации картинки
+        */
         break;
       default:
         if(text.includes('/hours')){
@@ -114,16 +151,6 @@ bot.on('callback_query', async msg => {
           const amountWords = parseInt(text.replace('/amountWords_', ''));
           addAmountWords(amountWords, id);
           setTimeout(() => bot.sendMessage(id, '🤝 Поздравляю! \nЕжедневно в ' + user[0].hours + ' час. ' + user[0].minutes + ' мин.' + ' мы будем изучать по ' + amountWords + ' слов(a).'), 500);
-        } else if(text.includes('/study statistics')){
-          clock();
-          //! НЕОБХОДИМО
-          /**
-           * НАСТРОЙКА https://rutube.ru/video/4b8047da05c099958e633b92187f32b8/
-            Необходимо:
-            1. Добавить в таблицу строку ДАТА запроса на обучение, КОЛИЧЕСТВО запросов в течении 24 часов
-            2. Подключить библиотеку создания изображения
-            3. Написать скрипт генерации картинки
-          */
         }
         //! ЕСЛИ ВЫБРАНО СЛОВО, ТО НЕОБХОДИМО ЕГО ОТОБРАЗИТЬ ЗАНОВО С ПЕРЕВОДОМ И ВЫБОРОМ ОПЦИЙ
         if(text.indexOf('/') == -1){
