@@ -1,3 +1,4 @@
+const path = require('path');
 const TelegramBot = require('node-telegram-bot-api');
 const {API_KEY_BOT, ID_USER, PASSWORD} = require('../config_bot.js');
 //!teamsDoNotRepeat
@@ -6,7 +7,8 @@ const {commands} = require('./src/commands');
 const {findWord, initialization, findUser, addUser, addHours, addMinutes,
        addAmountWords, getUsers, dayLessonUserUpdate, getWords, learnedWordIdUpdate,
        gatАccess, addRequests, getStatistics} = require('./src/api.js');
-const {clock} = require('./src/utility/drawGraph.js')
+// const {clock} = require('./src/utility/drawGraph.js')
+const {createImg} = require('./src/utility/createImg.js');
 
 const bot = new TelegramBot(API_KEY_BOT, {
   polling: {
@@ -70,6 +72,7 @@ bot.on('callback_query', async msg => {
   const user = await findUser(id);
   const access = isAccess(id, user, msg, text);
   if(!access) return null;
+  console.log(text);
     switch(text) {
       case '/сhoose time to study':
         setTimeout(() => bot.sendMessage(id, '🕛 Выберите час: ', hours), 500);
@@ -98,15 +101,7 @@ bot.on('callback_query', async msg => {
         await addRequests(user[0].user_id, user[0].amountWords, time);
         break;
       case '/study statistics':
-        // setTimeout(() => bot.sendMessage(id, '📋 Выберите количество слов: ', amountWords), 500);
-        /**
-         * Функция getStatistics получает данные обо всей статистике конкретного пользователя
-         * необходимо дополнить ее двумя параметрами:
-         * 1 - числовое выражение даты - понедельника текущей недели
-         * 2 - числовое выражение воскресенья - понедельника текущей недели
-         * 
-         */
-        function getStartDate(){
+        const currentMonday = (() => {
           let result = 0;
           const date = new Date();
           const time = date.getTime();
@@ -120,19 +115,11 @@ bot.on('callback_query', async msg => {
           } else {
             result = hours * 3600000 - minutes * 60000 - seconds*1000 - milliseconds;
           }
-          console.log("Текущий понедельник начался: ", result);
-        }
-        await getStatistics(user[0].user_id);
-        //! Сервер реализован в функции clock
-        clock();
-        //! НЕОБХОДИМО
-        /**
-         * НАСТРОЙКА https://rutube.ru/video/4b8047da05c099958e633b92187f32b8/
-          Необходимо:
-          1. Добавить в таблицу строку ДАТА запроса на обучение, КОЛИЧЕСТВО запросов в течении 24 часов
-          2. Подключить библиотеку создания изображения
-          3. Написать скрипт генерации картинки
-        */
+          return result;
+        })();
+        const statistics = await getStatistics(user[0].user_id, currentMonday);
+        const imagePath = await createImg(statistics);
+        bot.sendPhoto(id, imagePath, {caption: "Ваша статистика за неделю!"});
         break;
       default:
         if(text.includes('/hours')){

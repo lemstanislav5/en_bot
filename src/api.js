@@ -58,13 +58,36 @@ module.exports = {
         return result;
       });
   },
-  getStatistics: user_id => {
+  getStatistics: (user_id, currentMonday) => {
     console.log(user_id);
-    return query(db3000, 'all', 'SELECT * FROM statistics WHERE user_id=?', [user_id])
+    return query(db3000, 'all', 'SELECT * FROM statistics WHERE user_id=? AND date > ?', [user_id, currentMonday])
     .then(result=>{
-      console.log(result);
-      return result;
+      // Формируем массив по дням неделе в которых складываем результат за каждяй отдельный день
+      const rArr = result.reduce((acc, cur) => {
+        let date = new Date(cur.date);
+        let dayOfTheWeek = date.getDay() - 1;
+        let serch = acc.find(item => item.date == dayOfTheWeek);
+        if(serch == undefined){
+          acc = [...acc, {...cur, date: dayOfTheWeek}];
+        } else {
+          serch.words = serch.words + cur.words;
+        }
+        return acc;
+      }, []);
+      // Формируем массив для построения графика, состоящий из количества изученных слов за каждый день недели
+      return rArr.reduce((acc, cur) => {
+        acc[cur.date] = cur.words;
+        return acc;
+      }, [0, 0, 0, 0, 0, 0, 0]);
     });
+
+      // result.forEach(el => {
+      //   let date = new Date(el.date);
+      //   console.log(date.getDay());
+
+      // });
+      // console.log(result);
+      return result;
   },
   learnedWordIdUpdate: (learnedWordId, user_id) => {
     return query(db3000, 'run', 'UPDATE users SET learnedWordId=? WHERE user_id=?', [learnedWordId, user_id]);
